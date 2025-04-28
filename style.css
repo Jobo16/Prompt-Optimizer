@@ -1,0 +1,110 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #555;
+}
+
+.input-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Avoids padding issues */
+}
+
+#generate-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#generate-button:hover {
+    background-color: #0056b3;
+}
+
+#loading {
+    text-align: center;
+    margin: 20px 0;
+    font-style: italic;
+    color: #777;
+}
+
+#results-section {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+    gap: 20px;
+}
+
+.result-card {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes button to bottom */
+    min-height: 150px; /* Ensure cards have some height */
+}
+
+.result-text {
+    margin-bottom: 10px; /* Space between text and button */
+    flex-grow: 1; /* Allows text to take available space */
+    white-space: pre-wrap; /* Preserve line breaks from API */
+}
+
+.copy-button {
+    padding: 8px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-end; /* Align button to the right */
+    transition: background-color 0.3s ease;
+}
+
+.copy-button:hover {
+    background-color: #5a6268;
+}
+
+.api-key-warning {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    border-radius: 4px;
+    text-align: center;
+}

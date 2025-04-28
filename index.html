@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示词优化器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>提示词(prompt)优化器</h1>
+
+        <div class="input-section">
+            <label for="prompt-input">输入你的提示词:</label>
+            <textarea id="prompt-input" rows="4" placeholder="例如：写一首关于春天的诗"></textarea>
+
+            <label for="requirements-input">输入你的要求 (可选):</label>
+            <textarea id="requirements-input" rows="2" placeholder="例如：五言绝句，包含“花”和“月”"></textarea>
+
+            <button id="generate-button">生成优化提示词</button>
+        </div>
+
+        <div id="loading" style="display: none;">正在生成...</div>
+
+        <h2>优化结果:</h2>
+        <div id="results-section">
+            <div class="result-card" id="result-1">
+                <p class="result-text">结果 1 将显示在这里</p>
+                <button class="copy-button" data-result-id="result-1">复制</button>
+            </div>
+            <div class="result-card" id="result-2">
+                <p class="result-text">结果 2 将显示在这里</p>
+                <button class="copy-button" data-result-id="result-2">复制</button>
+            </div>
+            <div class="result-card" id="result-3">
+                <p class="result-text">结果 3 将显示在这里</p>
+                <button class="copy-button" data-result-id="result-3">复制</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.25/jsrsasign-all-min.js"></script> --> <!-- 删除或注释掉这行 -->
+</body>
+</html>
