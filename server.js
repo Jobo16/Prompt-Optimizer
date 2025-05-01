@@ -26,7 +26,7 @@ app.use(compression());
 // 配置 CORS
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://yourdomain.com'] // 生产环境域名
+        ? ['https://prompt.jobotek.onine'] // 生产环境域名
         : '*', // 开发环境允许所有来源
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization']

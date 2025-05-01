@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // API端点
-    const API_ENDPOINT = 'http://localhost:3000/api/optimize-prompt';
+    const API_ENDPOINT = '/api/optimize-prompt';
 
     // 初始化事件监听器
     function initEventListeners() {
