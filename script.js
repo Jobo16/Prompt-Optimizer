@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     // 获取DOM元素
     const elements = {
         promptInput: document.getElementById('prompt-input'),
@@ -13,11 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_ENDPOINT = 'http://localhost:3000/api/optimize-prompt';
 
     // 初始化事件监听器
-    initEventListeners();
-
-    // 初始化快捷键
-    initShortcuts();
-
     function initEventListeners() {
         // 生成按钮点击事件
         elements.generateButton.addEventListener('click', generateOptimizedPrompts);
@@ -34,6 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // 初始化结果卡片的事件监听
+        initResultCardListeners();
+    }
+
+    // 初始化结果卡片的事件监听器
+    function initResultCardListeners() {
         // 复制按钮点击事件
         document.querySelectorAll('.copy-button').forEach(button => {
             button.addEventListener('click', handleCopy);
@@ -45,38 +46,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initShortcuts() {
-        // 添加Ctrl+Enter快捷键
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                generateOptimizedPrompts();
-            }
-        });
+    // 处理复制功能
+    async function handleCopy(event) {
+        const card = event.target.closest('.result-card');
+        const textElement = card.querySelector('.result-text');
+        const text = textElement.textContent;
+
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('已复制到剪贴板', 'success');
+        } catch (err) {
+            console.error('复制失败:', err);
+            showToast('复制失败', 'error');
+        }
     }
 
+    // 处理编辑功能
+    function handleEdit(event) {
+        const card = event.target.closest('.result-card');
+        const textElement = card.querySelector('.result-text');
+        const currentText = textElement.textContent;
+
+        // 创建输入框
+        const textarea = document.createElement('textarea');
+        textarea.value = currentText;
+        textarea.className = 'edit-textarea';
+        
+        // 替换原有文本
+        textElement.style.display = 'none';
+        card.insertBefore(textarea, textElement);
+        textarea.focus();
+
+        // 添加保存按钮
+        const saveButton = document.createElement('button');
+        saveButton.textContent = '保存';
+        saveButton.className = 'save-button';
+        card.insertBefore(saveButton, textarea.nextSibling);
+
+        // 保存按钮点击事件
+        saveButton.addEventListener('click', () => {
+            const newText = textarea.value.trim();
+            textElement.textContent = newText;
+            textElement.style.display = 'block';
+            textarea.remove();
+            saveButton.remove();
+            showToast('修改已保存', 'success');
+        });
+
+        // 处理回车键保存
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveButton.click();
+            }
+        });
+
+        // 处理点击其他区域保存
+        function handleClickOutside(e) {
+            if (!card.contains(e.target)) {
+                saveButton.click();
+                document.removeEventListener('click', handleClickOutside);
+            }
+        }
+        // 延迟添加点击事件，避免立即触发
+        setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        }, 0);
+    }
+
+    // 生成优化后的提示词
     async function generateOptimizedPrompts() {
-        const userPrompt = elements.promptInput.value.trim();
+        const prompt = elements.promptInput.value.trim();
         const requirements = elements.requirementsInput.value.trim();
 
-        // 输入验证
-        if (!userPrompt) {
-            showToast('请输入提示词', 'error');
+        if (!prompt) {
+            showToast('请输入需要优化的提示词', 'error');
             return;
         }
 
-        try {
-            // 显示加载状态
-            elements.loading.style.display = 'block';
-            elements.generateButton.disabled = true;
+        // 显示加载提示
+        elements.loading.style.display = 'block';
+        elements.generateButton.disabled = true;
 
-            // 发送请求到后端
+        try {
             const response = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    prompt: userPrompt,
+                    prompt: prompt,
                     requirements: requirements
                 })
             });
@@ -103,109 +162,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // 更新结果显示
     function updateResults(results) {
-        const resultCards = document.querySelectorAll('.result-card');
-        
-        results.forEach((result, index) => {
-            if (index < resultCards.length) {
-                const card = resultCards[index];
-                const textElement = card.querySelector('.result-text');
-                textElement.textContent = result;
-                card.style.display = 'block';
-            }
-        });
+        elements.resultsSection.innerHTML = results.map((result, index) => `
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-number">优化版本 ${index + 1}</span>
+                    <div class="result-actions">
+                        <button class="copy-button" title="复制">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="edit-button" title="编辑">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="result-text">${result}</div>
+            </div>
+        `).join('');
 
-        // 隐藏多余的结果卡片
-        for (let i = results.length; i < resultCards.length; i++) {
-            resultCards[i].style.display = 'none';
-        }
+        // 重新初始化结果卡片的事件监听器
+        initResultCardListeners();
     }
 
-    async function handleCopy(event) {
-        const button = event.currentTarget;
-        const resultId = button.dataset.resultId;
-        const resultCard = document.getElementById(resultId);
-        const textElement = resultCard.querySelector('.result-text');
-        
-        try {
-            await navigator.clipboard.writeText(textElement.textContent);
-            showToast('复制成功！', 'success');
-        } catch (err) {
-            console.error('复制失败:', err);
-            showToast('复制失败，请手动复制', 'error');
-        }
-    }
-
-    function handleEdit(event) {
-        const button = event.currentTarget;
-        const resultCard = button.closest('.result-card');
-        const textElement = resultCard.querySelector('.result-text');
-        const originalText = textElement.textContent;
-
-        // 创建编辑区域
-        const editContainer = document.createElement('div');
-        editContainer.className = 'edit-container';
-        
-        const textarea = document.createElement('textarea');
-        textarea.className = 'edit-textarea';
-        textarea.value = originalText;
-        
-        const saveButton = document.createElement('button');
-        saveButton.className = 'save-button';
-        saveButton.innerHTML = '<i class="fas fa-check"></i>保存';
-        
-        editContainer.appendChild(textarea);
-        editContainer.appendChild(saveButton);
-
-        // 替换原有内容
-        const resultContent = resultCard.querySelector('.result-content');
-        const originalContent = resultContent.innerHTML;
-        resultContent.innerHTML = '';
-        resultContent.appendChild(editContainer);
-
-        // 自动调整文本框高度
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-
-        // 保存按钮点击事件
-        saveButton.addEventListener('click', () => {
-            const newText = textarea.value.trim();
-            if (newText) {
-                textElement.textContent = newText;
-                resultContent.innerHTML = originalContent;
-                showToast('修改已保存', 'success');
-            }
-        });
-
-        // 聚焦到文本框
-        textarea.focus();
-    }
-
-    function showToast(message, type = 'success') {
-        // 移除现有的toast
-        const existingToast = document.querySelector('.toast');
-        if (existingToast) {
-            existingToast.remove();
-        }
-
-        // 创建新的toast
+    // 显示提示信息
+    function showToast(message, type = 'info') {
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            ${message}
-        `;
-
-        // 添加到页面
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
         document.body.appendChild(toast);
 
-        // 显示动画
+        // 添加显示类名触发动画
         setTimeout(() => toast.classList.add('show'), 10);
 
-        // 3秒后消失
+        // 3秒后移除
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    // 初始化
+    initEventListeners();
 });

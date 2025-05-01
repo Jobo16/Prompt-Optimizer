@@ -5,17 +5,9 @@ const KJUR = require('jsrsasign');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const NodeCache = require('node-cache');
 
 const app = express();
 const port = process.env.PORT || 3000;
-
-// 创建缓存实例，TTL设置为1小时
-const cache = new NodeCache({ 
-    stdTTL: 3600,
-    checkperiod: 120,
-    useClones: false
-});
 
 // --- 配置 ---
 const ZHIPU_API_KEY = process.env.ZHIPU_API_KEY;
@@ -99,15 +91,6 @@ app.post('/api/optimize-prompt', async (req, res) => {
             return res.status(400).json({ error: '请提供需要优化的提示词' });
         }
 
-        // 生成缓存键
-        const cacheKey = `${prompt}-${requirements || ''}`;
-
-        // 检查缓存
-        const cachedResult = cache.get(cacheKey);
-        if (cachedResult) {
-            return res.json({ results: cachedResult, fromCache: true });
-        }
-
         // 准备系统提示词
         const systemPrompt = `你是一位专业的提示词优化专家。你的任务是优化用户提供的提示词，使其更有效地与AI模型交互。
 
@@ -183,9 +166,6 @@ app.post('/api/optimize-prompt', async (req, res) => {
             .split('\n')
             .filter(line => line.trim())
             .slice(0, 3);
-
-        // 保存到缓存
-        cache.set(cacheKey, optimizedPrompts);
 
         res.json({ results: optimizedPrompts });
 
