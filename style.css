@@ -153,45 +153,107 @@ h1::after {
 
 .result-card {
     background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e1e8ed;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
 }
 
 .result-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .result-header {
-    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px 15px;
-    border-bottom: 1px solid #e1e8ed;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0;
 }
 
-.version {
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.result-content {
-    padding: 20px;
-}
-
-.result-text {
-    margin: 0 0 15px 0;
-    color: #2c3e50;
-    font-size: 1rem;
-    line-height: 1.6;
-    min-height: 100px;
+.result-number {
+    font-weight: 500;
+    color: #666;
 }
 
 .result-actions {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    gap: 8px;
+}
+
+.result-actions button {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.result-actions button:hover {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.result-text {
+    padding: 15px;
+    line-height: 1.5;
+    color: #333;
+    min-height: 60px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.edit-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 15px;
+    border: none;
+    background: #f8f9fa;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    .result-card {
+        background: #2a2a2a;
+        border-color: #444;
+    }
+
+    .result-header {
+        background-color: #333;
+        border-bottom-color: #444;
+    }
+
+    .result-number {
+        color: #ccc;
+    }
+
+    .result-actions button {
+        color: #ccc;
+    }
+
+    .result-actions button:hover {
+        background-color: #444;
+        color: #fff;
+    }
+
+    .result-text {
+        color: #e0e0e0;
+    }
+
+    .edit-textarea {
+        background: #333;
+        color: #e0e0e0;
+    }
 }
 
 .action-button {
@@ -221,19 +283,6 @@ h1::after {
 
 .edit-button:hover {
     background: #2980b9;
-}
-
-.edit-textarea {
-    width: 100%;
-    min-height: 150px;
-    padding: 12px;
-    border: 2px solid #3498db;
-    border-radius: 6px;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    resize: vertical;
-    box-sizing: border-box;
 }
 
 .save-button {
@@ -327,10 +376,6 @@ h1::after {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.result-card {
-    animation: fadeIn 0.5s ease-out;
-}
-
 /* 添加暗色模式支持 */
 @media (prefers-color-scheme: dark) {
     body {
@@ -352,30 +397,7 @@ h1::after {
         color: #ecf0f1;
     }
     
-    .result-card {
-        background: #34495e;
-        border-color: #2c3e50;
-    }
-    
-    .result-text {
-        color: #ecf0f1;
-    }
-    
-    .result-header {
-        background: #2c3e50;
-        border-color: #34495e;
-    }
-    
-    .version {
-        color: #ecf0f1;
-    }
-    
     h1, .input-section label {
-        color: #ecf0f1;
-    }
-    
-    .edit-textarea {
-        background: #2c3e50;
         color: #ecf0f1;
     }
 }
