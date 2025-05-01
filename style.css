@@ -1,110 +1,381 @@
 body {
-    font-family: sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 20px;
-    background-color: #f4f4f4;
-    color: #333;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #2c3e50;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 800px;
-    margin: auto;
+    max-width: 1000px;
+    margin: 20px auto;
     background: #fff;
     padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-h1, h2 {
+h1 {
     text-align: center;
-    color: #555;
+    color: #2c3e50;
+    font-size: 2.5em;
+    margin-bottom: 1.5em;
+    font-weight: 600;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #3498db;
+    margin: 10px auto;
+    border-radius: 2px;
+}
+
+.input-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
 }
 
 .input-section label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #34495e;
 }
 
 .input-section textarea {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Avoids padding issues */
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+}
+
+.input-section textarea:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
 }
 
 #generate-button {
     display: block;
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
+    padding: 14px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #generate-button:hover {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+}
+
+.paste-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.paste-button:hover {
+    background-color: #e0e0e0;
+    color: #333;
+    border-color: #ccc;
+}
+
+.paste-button:active {
+    transform: translateY(1px);
+}
+
+.paste-button i {
+    font-size: 0.9em;
+}
+
+/* 适配深色模式 */
+@media (prefers-color-scheme: dark) {
+    .paste-button {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #ccc;
+    }
+
+    .paste-button:hover {
+        background-color: #333;
+        color: #fff;
+        border-color: #555;
+    }
 }
 
 #loading {
     text-align: center;
-    margin: 20px 0;
+    margin: 30px 0;
     font-style: italic;
-    color: #777;
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.results-container {
+    margin-top: 40px;
 }
 
 #results-section {
-    margin-top: 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    padding: 10px;
 }
 
 .result-card {
-    background-color: #e9ecef;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Pushes button to bottom */
-    min-height: 150px; /* Ensure cards have some height */
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.result-header {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.version {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.result-content {
+    padding: 20px;
 }
 
 .result-text {
-    margin-bottom: 10px; /* Space between text and button */
-    flex-grow: 1; /* Allows text to take available space */
-    white-space: pre-wrap; /* Preserve line breaks from API */
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1rem;
+    line-height: 1.6;
+    min-height: 100px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.action-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
 }
 
 .copy-button {
-    padding: 8px 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    align-self: flex-end; /* Align button to the right */
-    transition: background-color 0.3s ease;
+    background: #2ecc71;
 }
 
 .copy-button:hover {
-    background-color: #5a6268;
+    background: #27ae60;
 }
 
-.api-key-warning {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #fff3cd;
+.edit-button {
+    background: #3498db;
+}
+
+.edit-button:hover {
+    background: #2980b9;
+}
+
+.edit-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+    border: 2px solid #3498db;
+    border-radius: 6px;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.save-button {
+    padding: 8px 16px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-button:hover {
+    background: #27ae60;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-success {
+    border-left: 4px solid #2ecc71;
+}
+
+.toast-error {
+    border-left: 4px solid #e74c3c;
+}
+
+.error-message {
+    margin-top: 10px;
+    padding: 12px;
+    background: #fff3cd;
     border: 1px solid #ffeeba;
+    border-radius: 6px;
     color: #856404;
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tips {
+    margin-top: 30px;
     text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .input-section {
+        padding: 15px;
+    }
+    
+    #results-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 添加动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* 添加暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: #ecf0f1;
+    }
+    
+    .container {
+        background: #2c3e50;
+    }
+    
+    .input-section {
+        background: #34495e;
+    }
+    
+    .input-section textarea {
+        background: #2c3e50;
+        border-color: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .result-card {
+        background: #34495e;
+        border-color: #2c3e50;
+    }
+    
+    .result-text {
+        color: #ecf0f1;
+    }
+    
+    .result-header {
+        background: #2c3e50;
+        border-color: #34495e;
+    }
+    
+    .version {
+        color: #ecf0f1;
+    }
+    
+    h1, .input-section label {
+        color: #ecf0f1;
+    }
+    
+    .edit-textarea {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
 }

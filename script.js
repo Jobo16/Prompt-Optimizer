@@ -1,170 +1,211 @@
-const promptInput = document.getElementById('prompt-input');
-const requirementsInput = document.getElementById('requirements-input');
-const generateButton = document.getElementById('generate-button');
-const loadingIndicator = document.getElementById('loading');
-const resultsSection = document.getElementById('results-section');
-const resultCards = resultsSection.querySelectorAll('.result-card');
-const copyButtons = resultsSection.querySelectorAll('.copy-button');
+document.addEventListener('DOMContentLoaded', () => {
+    // 获取DOM元素
+    const elements = {
+        promptInput: document.getElementById('prompt-input'),
+        requirementsInput: document.getElementById('requirements-input'),
+        generateButton: document.getElementById('generate-button'),
+        loading: document.getElementById('loading'),
+        resultsSection: document.getElementById('results-section'),
+        pasteButton: document.getElementById('paste-button')
+    };
 
-// --- 配置 ---
-// 后端 API 的地址 (使用相对路径，由 Nginx 反向代理处理)
-const BACKEND_API_ENDPOINT = '/api/optimize-prompt'; // 使用引号将其定义为字符串
-//const BACKEND_API_ENDPOINT = 'http://localhost:3000/api/optimize-prompt';
-// 移除 ZHIPU_API_KEY, ZHIPU_API_ENDPOINT, MODEL_NAME
+    // API端点
+    const API_ENDPOINT = 'http://localhost:3000/api/optimize-prompt';
 
-// --- 事件监听 ---
-generateButton.addEventListener('click', handleGenerateClick);
+    // 初始化事件监听器
+    initEventListeners();
 
-copyButtons.forEach(button => {
-    button.addEventListener('click', handleCopyClick);
+    // 初始化快捷键
+    initShortcuts();
+
+    function initEventListeners() {
+        // 生成按钮点击事件
+        elements.generateButton.addEventListener('click', generateOptimizedPrompts);
+
+        // 粘贴按钮点击事件
+        elements.pasteButton.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                elements.promptInput.value = text;
+                showToast('已粘贴剪贴板内容', 'success');
+            } catch (err) {
+                console.error('粘贴失败:', err);
+                showToast('无法访问剪贴板', 'error');
+            }
+        });
+
+        // 复制按钮点击事件
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', handleCopy);
+        });
+
+        // 编辑按钮点击事件
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', handleEdit);
+        });
+    }
+
+    function initShortcuts() {
+        // 添加Ctrl+Enter快捷键
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                generateOptimizedPrompts();
+            }
+        });
+    }
+
+    async function generateOptimizedPrompts() {
+        const userPrompt = elements.promptInput.value.trim();
+        const requirements = elements.requirementsInput.value.trim();
+
+        // 输入验证
+        if (!userPrompt) {
+            showToast('请输入提示词', 'error');
+            return;
+        }
+
+        try {
+            // 显示加载状态
+            elements.loading.style.display = 'block';
+            elements.generateButton.disabled = true;
+
+            // 发送请求到后端
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: userPrompt,
+                    requirements: requirements
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('请求失败');
+            }
+
+            const data = await response.json();
+            
+            // 更新结果显示
+            updateResults(data.results);
+            
+            // 显示成功提示
+            showToast('提示词生成成功！', 'success');
+
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('生成失败，请稍后重试', 'error');
+        } finally {
+            // 恢复按钮状态和隐藏加载提示
+            elements.loading.style.display = 'none';
+            elements.generateButton.disabled = false;
+        }
+    }
+
+    function updateResults(results) {
+        const resultCards = document.querySelectorAll('.result-card');
+        
+        results.forEach((result, index) => {
+            if (index < resultCards.length) {
+                const card = resultCards[index];
+                const textElement = card.querySelector('.result-text');
+                textElement.textContent = result;
+                card.style.display = 'block';
+            }
+        });
+
+        // 隐藏多余的结果卡片
+        for (let i = results.length; i < resultCards.length; i++) {
+            resultCards[i].style.display = 'none';
+        }
+    }
+
+    async function handleCopy(event) {
+        const button = event.currentTarget;
+        const resultId = button.dataset.resultId;
+        const resultCard = document.getElementById(resultId);
+        const textElement = resultCard.querySelector('.result-text');
+        
+        try {
+            await navigator.clipboard.writeText(textElement.textContent);
+            showToast('复制成功！', 'success');
+        } catch (err) {
+            console.error('复制失败:', err);
+            showToast('复制失败，请手动复制', 'error');
+        }
+    }
+
+    function handleEdit(event) {
+        const button = event.currentTarget;
+        const resultCard = button.closest('.result-card');
+        const textElement = resultCard.querySelector('.result-text');
+        const originalText = textElement.textContent;
+
+        // 创建编辑区域
+        const editContainer = document.createElement('div');
+        editContainer.className = 'edit-container';
+        
+        const textarea = document.createElement('textarea');
+        textarea.className = 'edit-textarea';
+        textarea.value = originalText;
+        
+        const saveButton = document.createElement('button');
+        saveButton.className = 'save-button';
+        saveButton.innerHTML = '<i class="fas fa-check"></i>保存';
+        
+        editContainer.appendChild(textarea);
+        editContainer.appendChild(saveButton);
+
+        // 替换原有内容
+        const resultContent = resultCard.querySelector('.result-content');
+        const originalContent = resultContent.innerHTML;
+        resultContent.innerHTML = '';
+        resultContent.appendChild(editContainer);
+
+        // 自动调整文本框高度
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+
+        // 保存按钮点击事件
+        saveButton.addEventListener('click', () => {
+            const newText = textarea.value.trim();
+            if (newText) {
+                textElement.textContent = newText;
+                resultContent.innerHTML = originalContent;
+                showToast('修改已保存', 'success');
+            }
+        });
+
+        // 聚焦到文本框
+        textarea.focus();
+    }
+
+    function showToast(message, type = 'success') {
+        // 移除现有的toast
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        // 创建新的toast
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${message}
+        `;
+
+        // 添加到页面
+        document.body.appendChild(toast);
+
+        // 显示动画
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        // 3秒后消失
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 });
-
-// --- 功能函数 ---
-
-async function handleGenerateClick() {
-    const userPrompt = promptInput.value.trim();
-    const userRequirements = requirementsInput.value.trim();
-
-    if (!userPrompt) {
-        alert('请输入你的提示词！');
-        return;
-    }
-
-    // 系统提示现在由前端定义，发送给后端
-    let systemPrompt = `你是一个提示词优化助手。请根据用户输入的原始提示词和可选的要求，生成3个不同的、更优化、更具体、更有效的提示词版本，用于输入给大语言模型。
-请严格遵守以下格式输出：
-1.  生成 **正好 3 个** 优化后的提示词。
-2.  每个提示词 **单独占一行**。
-3.  **不要** 在每个提示词前添加任何编号（如 1., 2., 3.）或标记（如 -）。
-4.  **不要** 添加任何额外的解释、标题或说明文字，直接输出三个提示词，每个一行。`;
-
-    let combinedPrompt = `原始提示词：\n${userPrompt}\n\n`;
-    if (userRequirements) {
-        combinedPrompt += `要求：\n${userRequirements}\n\n`;
-    }
-
-    showLoading(true);
-    clearResults();
-
-    try {
-        // 调用后端 API 获取三个结果
-        const optimizedPrompts = await callBackendAPI(systemPrompt, combinedPrompt); // 修改调用函数
-
-        if (optimizedPrompts && optimizedPrompts.length > 0) {
-             // 假设 API 返回的是一个包含三个提示词的字符串，用换行符分隔
-            const promptsArray = optimizedPrompts.split('\n').map(p => p.trim()).filter(p => p.length > 0);
-            displayResults(promptsArray.slice(0, 3));
-        } else {
-            // 后端应该已经处理了空结果的情况，但以防万一
-            displayError('未能从后端获取有效的优化结果。');
-        }
-
-    } catch (error) {
-        console.error('调用后端 API 时出错:', error);
-        // 显示从后端传来的错误信息或通用错误
-        displayError(`生成失败: ${error.message || '无法连接到后端服务'}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-// 修改：调用后端 API 而不是直接调用智谱 API
-async function callBackendAPI(systemPrompt, userPrompt) {
-    const response = await fetch(BACKEND_API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        // 将 systemPrompt 和 userPrompt 发送给后端
-        body: JSON.stringify({
-            systemPrompt: systemPrompt,
-            userPrompt: userPrompt
-        })
-    });
-
-    const data = await response.json(); // 解析后端返回的 JSON
-
-    if (!response.ok) {
-        // 如果后端返回错误，则抛出错误，错误信息在 data.error 中
-        throw new Error(data.error || `请求失败: ${response.status} ${response.statusText}`);
-    }
-
-    // 假设后端成功时返回 { optimizedPrompts: "..." }
-    if (data.optimizedPrompts) {
-        return data.optimizedPrompts;
-    } else {
-        console.error("后端响应格式不符合预期:", data);
-        return null;
-    }
-}
-
-// --- 移除 JWT Token 生成函数 ---
-// function generateToken(apiKey) { ... } // 删除整个函数
-
-function showLoading(isLoading) {
-    loadingIndicator.style.display = isLoading ? 'block' : 'none';
-    generateButton.disabled = isLoading;
-}
-
-function clearResults() {
-    resultCards.forEach(card => {
-        card.querySelector('.result-text').textContent = '...';
-        card.style.display = 'none'; // 先隐藏
-    });
-}
-
-function displayResults(prompts) {
-     if (!prompts || prompts.length === 0) {
-        // 如果没有结果，显示提示信息
-        resultCards.forEach((card, index) => {
-            card.querySelector('.result-text').textContent = index === 0 ? '未能生成提示词' : '...';
-            card.style.display = index === 0 ? 'flex' : 'none'; // 只显示第一个卡片提示错误
-        });
-        return;
-    }
-    prompts.forEach((prompt, index) => {
-        if (index < resultCards.length) {
-            const card = resultCards[index];
-            card.querySelector('.result-text').textContent = prompt;
-            card.style.display = 'flex'; // 显示卡片
-        }
-    });
-     // 隐藏未使用的卡片
-    for (let i = prompts.length; i < resultCards.length; i++) {
-        resultCards[i].style.display = 'none';
-    }
-}
-
-function displayError(message) {
-    // 可以在结果区域显示错误，或者使用 alert
-    alert(`错误: ${message}`);
-     // 清理界面状态
-    resultCards.forEach(card => {
-        card.querySelector('.result-text').textContent = '生成失败';
-        card.style.display = 'flex'; // 显示卡片以便看到错误信息
-    });
-     for (let i = 1; i < resultCards.length; i++) { // 只保留第一个显示错误，隐藏其他
-        resultCards[i].style.display = 'none';
-    }
-}
-
-function handleCopyClick(event) {
-    const button = event.target;
-    const resultId = button.getAttribute('data-result-id');
-    const resultCard = document.getElementById(resultId);
-    const textToCopy = resultCard.querySelector('.result-text').textContent;
-
-    navigator.clipboard.writeText(textToCopy)
-        .then(() => {
-            // 可选：给用户一个复制成功的反馈
-            const originalText = button.textContent;
-            button.textContent = '已复制!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 1500); // 1.5秒后恢复原状
-        })
-        .catch(err => {
-            console.error('无法复制文本: ', err);
-            alert('复制失败，请手动复制。');
-        });
-}

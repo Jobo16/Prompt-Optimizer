@@ -35,17 +35,17 @@
 
 ### 2. 安装依赖
 
-在项目根目录 (<mcfolder name="prom" path="c:\Users\admin\Desktop\prom"></mcfolder>) 下打开终端，运行以下命令安装后端依赖：
+在项目根目录下打开终端，运行以下命令安装后端依赖：
 
 ```bash
 npm install
 ```
 ### 3. 配置环境
 
-*   在项目根目录 (`prom`) 创建一个名为 `.env` 的文件。
+*   在项目根目录创建一个名为 `.env` 的文件。
 *   在 `.env` 文件中添加你的智谱 API Key，格式如下 (请将 `你的ID.你的Secret` 替换为你自己的 API Key)：
 
-    ```env:.env
+    ```env
     ZHIPU_API_KEY=你的ID.你的Secret
     ```
 
@@ -64,7 +64,7 @@ node server.js
 *   直接在浏览器中打开 `index.html` 文件。
 *   **重要**: 为了让前端能够访问后端 API，请确保 `script.js` 文件中的 `BACKEND_API_ENDPOINT` 指向你的后端服务地址。对于本地开发，可以取消注释并使用绝对路径：
 
-    ```javascript:c%3A%5CUsers%5Cadmin%5CDesktop%5Cprom%5Cscript.js
+    ```javascript
     // const BACKEND_API_ENDPOINT = '/api/optimize-prompt'; // 生产环境或使用反向代理时
     const BACKEND_API_ENDPOINT = 'http://localhost:3000/api/optimize-prompt'; // 本地开发时
     ```
@@ -78,5 +78,4 @@ node server.js
 *   请妥善保管你的 `.env` 文件和 API Key，不要将其提交到版本控制系统（项目中已包含 `.gitignore` 文件来忽略 `.env`）。
 *   前端 `script.js` 中的 `systemPrompt` 变量定义了优化任务的具体指示，可以根据需要调整。
 *   后端使用了 `cors` 中间件允许所有来源的请求，在生产环境中应配置更严格的规则。
-
-
+*   API请求地址为 `/api/optimize-prompt`，请确保在前端代码中正确配置。

@@ -3,44 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提示词优化器</title>
+    <title>提示词优化器 - AI驱动的提示词优化工具</title>
+    <meta name="description" content="使用AI技术优化你的提示词，让AI更好地理解你的需求">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>提示词(prompt)优化器</h1>
+        <header>
+            <h1>
+                <i class="fas fa-magic"></i>
+                提示词优化器
+                <span class="subtitle">让AI更懂你的需求</span>
+            </h1>
+        </header>
 
         <div class="input-section">
-            <label for="prompt-input">输入你的提示词:</label>
-            <textarea id="prompt-input" rows="4" placeholder="例如：写一首关于春天的诗"></textarea>
+            <div class="input-group">
+                <label for="prompt-input">
+                    <i class="fas fa-pencil-alt"></i>
+                    输入你的提示词:
+                    <button id="paste-button" class="paste-button" title="粘贴">
+                        <i class="fas fa-paste"></i>
+                    </button>
+                </label>
+                <textarea 
+                    id="prompt-input" 
+                    rows="4" 
+                    placeholder="例如：写一首关于春天的诗"
+                    autofocus
+                ></textarea>
+            </div>
 
-            <label for="requirements-input">输入你的要求 (可选):</label>
-            <textarea id="requirements-input" rows="2" placeholder="例如：五言绝句，包含“花”和“月”"></textarea>
+            <div class="input-group">
+                <label for="requirements-input">
+                    <i class="fas fa-list-check"></i>
+                    输入你的要求 (可选):
+                </label>
+                <textarea 
+                    id="requirements-input" 
+                    rows="2" 
+                    placeholder="例如：五言绝句，包含"花"和"月""
+                ></textarea>
+            </div>
 
-            <button id="generate-button">生成优化提示词</button>
+            <button id="generate-button">
+                <i class="fas fa-wand-sparkles"></i>
+                生成优化提示词
+            </button>
         </div>
 
-        <div id="loading" style="display: none;">正在生成...</div>
+        <div id="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+            正在生成优化提示词...
+        </div>
 
-        <h2>优化结果:</h2>
-        <div id="results-section">
-            <div class="result-card" id="result-1">
-                <p class="result-text">结果 1 将显示在这里</p>
-                <button class="copy-button" data-result-id="result-1">复制</button>
-            </div>
-            <div class="result-card" id="result-2">
-                <p class="result-text">结果 2 将显示在这里</p>
-                <button class="copy-button" data-result-id="result-2">复制</button>
-            </div>
-            <div class="result-card" id="result-3">
-                <p class="result-text">结果 3 将显示在这里</p>
-                <button class="copy-button" data-result-id="result-3">复制</button>
+        <div class="results-container">
+            <h2><i class="fas fa-lightbulb"></i> 优化结果:</h2>
+            <div id="results-section">
+                <div class="result-card" id="result-1">
+                    <div class="result-header">
+                        <span class="version">版本 1</span>
+                    </div>
+                    <div class="result-content">
+                        <p class="result-text">结果 1 将显示在这里</p>
+                        <div class="result-actions">
+                            <button class="action-button copy-button" data-result-id="result-1">
+                                <i class="fas fa-copy"></i>
+                                复制
+                            </button>
+                            <button class="action-button edit-button">
+                                <i class="fas fa-pen"></i>
+                                编辑
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card" id="result-2">
+                    <div class="result-header">
+                        <span class="version">版本 2</span>
+                    </div>
+                    <div class="result-content">
+                        <p class="result-text">结果 2 将显示在这里</p>
+                        <div class="result-actions">
+                            <button class="action-button copy-button" data-result-id="result-2">
+                                <i class="fas fa-copy"></i>
+                                复制
+                            </button>
+                            <button class="action-button edit-button">
+                                <i class="fas fa-pen"></i>
+                                编辑
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card" id="result-3">
+                    <div class="result-header">
+                        <span class="version">版本 3</span>
+                    </div>
+                    <div class="result-content">
+                        <p class="result-text">结果 3 将显示在这里</p>
+                        <div class="result-actions">
+                            <button class="action-button copy-button" data-result-id="result-3">
+                                <i class="fas fa-copy"></i>
+                                复制
+                            </button>
+                            <button class="action-button edit-button">
+                                <i class="fas fa-pen"></i>
+                                编辑
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <footer>
+            <p class="tips">
+                <i class="fas fa-lightbulb"></i>
+                提示：尝试添加具体的要求，如字数限制、风格偏好等，可以获得更好的优化效果。
+            </p>
+        </footer>
     </div>
 
     <script src="script.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.25/jsrsasign-all-min.js"></script> --> <!-- 删除或注释掉这行 -->
 </body>
 </html>
